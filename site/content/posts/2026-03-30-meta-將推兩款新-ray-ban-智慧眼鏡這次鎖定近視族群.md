@@ -1,7 +1,7 @@
 ---
 title: "Meta 將推兩款新 Ray-Ban 智慧眼鏡，這次鎖定近視族群"
 date: 2026-03-30T03:05:08+08:00
-category: "technology"
+categories: ["technology"]
 draft: false
 source_url: "https://technews.tw/2026/03/28/meta-ai-glasses-2/"
 ---

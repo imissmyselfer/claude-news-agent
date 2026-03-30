@@ -1,3 +1,4 @@
+
 """
 文章發布工具
 將整理好的新聞輸出為 Hugo/Eleventy 相容的 Markdown 檔案
@@ -49,7 +50,7 @@ async def publish_article(
     front_matter = f"""---
 title: "{title}"
 date: {now.strftime("%Y-%m-%dT%H:%M:%S+08:00")}
-category: "{category}"
+categories: "{category}"
 draft: false
 source_url: "{source_url}"
 ---

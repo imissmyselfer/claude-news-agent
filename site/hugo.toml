@@ -1,9 +1,52 @@
-baseURL = "https://imissmyselfer.netlify.app/"
+baseURL = "https://claude-news-agent.netlify.app/"
 languageCode = "zh-tw"
-title = "位元日報 Bit Daily"
-theme = "ananke"
+title = "Bit Daily"
+theme = "mainroad"
 defaultContentLanguage = "zh-tw"
+[pagination]
+  pagerSize = 10
 
-[params]
+[Params]
   description = "每天一點位元，掌握世界脈動"
-  show_reading_time = true
+  opengraph = true
+  readmore = true
+  authorbox = false
+  pager = true
+  post_meta = ["date", "categories"]
+  customCSS = ["css/custom.css"]
+  highlightColor = "#22c55e"
+  mainSections = ["posts"]
+
+[Params.logo]
+  subtitle = "Just Another Site"
+
+[Params.style.vars]
+  highlightColor = "#22c55e"
+
+[Params.sidebar]
+  home = "right"
+  list = "right"
+  single = "right"
+  widgets = ["search", "recent", "categories"]
+
+[Params.widgets]
+  recent_num = 5
+  tags_counter = false
+
+[menu]
+  [[menu.main]]
+    name = "首頁"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "國際"
+    url = "/categories/international/"
+    weight = 2
+  [[menu.main]]
+    name = "科技"
+    url = "/categories/technology/"
+    weight = 3
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"

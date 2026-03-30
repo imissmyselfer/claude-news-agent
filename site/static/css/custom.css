@@ -1,0 +1,124 @@
+/* 位元日報 Bit Daily — 藍綠配色 */
+
+/* Header 白底 */
+header {
+  background: #ffffff !important;
+  border-bottom: none !important;
+}
+
+/* 網站名稱 深藍色 */
+.logo__title {
+  color: #0f172a !important;
+}
+
+.logo__tagline {
+  color: #64748b !important;
+}
+
+/* 導覽列 深藍底 + 綠色 accent */
+.nav {
+  background: #0f172a !important;
+  border-bottom: 3px solid #22c55e !important;
+}
+
+.menu a {
+  color: #cbd5e1 !important;
+}
+
+.menu a:hover,
+.menu__item--active a {
+  color: #22c55e !important;
+  background: transparent !important;
+}
+
+/* 文章標題 */
+.list__title a,
+.post__title a {
+  color: #0f172a !important;
+}
+
+.list__title a:hover,
+.post__title a:hover {
+  color: #0284c7 !important;
+}
+
+/* 日期 */
+.post__meta,
+.list__meta {
+  color: #64748b !important;
+}
+
+/* 側欄標題 */
+.widget__title {
+  border-bottom: 2px solid #0ea5e9 !important;
+  color: #0f172a !important;
+}
+
+/* 繼續閱讀按鈕 */
+.list__footer-readmore {
+  background: #0ea5e9 !important;
+  color: #fff !important;
+  padding: 4px 14px !important;
+  border-radius: 4px !important;
+  text-decoration: none !important;
+}
+
+.list__footer-readmore:hover {
+  background: #22c55e !important;
+  color: #fff !important;
+}
+
+/* 副標題藍色 */
+.logo__tagline {
+  color: #0ea5e9 !important;
+}
+
+/* 修 highlight 綠色背景上的文字 */
+.menu__item--active a,
+.nav .menu__item--active a {
+  color: #ffffff !important;
+  background: #22c55e !important;
+  padding: 5px 10px !important;
+}
+
+/* 文章標題大小統一 — 移除重複標題 */
+.list__title {
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  color: #64748b !important;
+}
+
+.post__title {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+}
+
+/* 導覽列 active 項目文字強制白色 */
+.nav .menu__item--active > a,
+.menu .menu__item--active a,
+.menu__item--active .menu__btn {
+  color: #ffffff !important;
+}
+
+/* active 選單項目文字強制白色 */
+.menu__item--active .menu__link {
+  color: #ffffff !important;
+}
+
+/* 強制 active 選單白色 — 高優先度 */
+nav.menu li.menu__item--active a.menu__link {
+  color: #ffffff !important;
+}
+
+/* 正確的 active 選單文字 */
+.menu__item--active .menu__text,
+.menu__item--active span.menu__text {
+  color: #ffffff !important;
+}
+
+/* 所有選單文字強制白色 */
+.menu__link,
+.menu__link .menu__text,
+span.menu__text {
+  color: #ffffff !important;
+}
