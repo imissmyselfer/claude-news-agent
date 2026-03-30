@@ -1,4 +1,4 @@
-# 📰 個人新聞台 — Personal News Agent
+# 📰 位元日報 Bit Daily
 
 一個由 **Claude Agent SDK** 驅動的個人新聞網站，每天自動抓取國際與科技新聞、翻譯成繁體中文，並發布到公開網站。
 

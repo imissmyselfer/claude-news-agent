@@ -1,9 +1,9 @@
 baseURL = "https://imissmyselfer.netlify.app/"
 languageCode = "zh-tw"
-title = "我的個人新聞台"
+title = "位元日報 Bit Daily"
 theme = "ananke"
 defaultContentLanguage = "zh-tw"
 
 [params]
-  description = "每日自動抓取國際與科技新聞，翻譯成繁體中文"
+  description = "每天一點位元，掌握世界脈動"
   show_reading_time = true
