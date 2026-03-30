@@ -1,0 +1,9 @@
+baseURL = "https://imissmyselfer.netlify.app/"
+languageCode = "zh-tw"
+title = "我的個人新聞台"
+theme = "ananke"
+defaultContentLanguage = "zh-tw"
+
+[params]
+  description = "每日自動抓取國際與科技新聞，翻譯成繁體中文"
+  show_reading_time = true
