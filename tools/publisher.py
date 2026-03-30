@@ -50,7 +50,7 @@ async def publish_article(
     front_matter = f"""---
 title: "{title}"
 date: {now.strftime("%Y-%m-%dT%H:%M:%S+08:00")}
-categories: "{category}"
+categories: ["{category}"]
 draft: false
 source_url: "{source_url}"
 ---
