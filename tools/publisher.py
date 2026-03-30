@@ -55,8 +55,8 @@ source_url: "{source_url}"
 ---
 """
 
-    full_content = front_matter + "\n" + content
-
+    source_link = f"\n\n---\n📎 **原文來源：** [{source_url}]({source_url})" if source_url else ""
+    full_content = front_matter + "\n" + content + source_link
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(full_content)
 
