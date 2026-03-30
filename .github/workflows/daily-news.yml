@@ -51,10 +51,11 @@ jobs:
           NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
         run: python agent/main.py --url "${{ github.event.inputs.url }}"
 
-      - name: 提交並推送新文章
+- name: 提交並推送新文章
         run: |
           git config user.name "News Bot"
           git config user.email "bot@newsbot.local"
           git add output/posts/
           git diff --staged --quiet || git commit -m "📰 自動發布新聞 $(date +'%Y-%m-%d')"
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
