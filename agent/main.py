@@ -106,8 +106,25 @@ async def run_daily_digest():
 今天是 {today}，請完成每日新聞台的工作流程：
 1. 使用 fetch_news 抓取 international 類別前 3 篇新聞
 2. 使用 fetch_news 抓取 technology 類別前 3 篇新聞
-3. 對每篇使用 translate 翻譯成繁體中文
-4. 使用 publish 發布每篇文章（含中文標題、來源、摘要、重點）
+3. 使用 fetch_news 抓取 local 類別前 3 篇新聞（Los Altos、Mountain View、Palo Alto 本地新聞）
+4. 對每篇使用 read_url 讀取完整內容，再用 translate 翻譯成繁體中文
+5. 使用 publish 發布每篇文章，注意：
+   - title 填入中文標題
+   - content 只包含來源、摘要與重點，不要再重複標題（Hugo 會自動顯示）
+   - content 格式如下：
+     **來源：** xxx｜**發布日期：** yyyy-mm-dd
+
+     ---
+
+     ### 📋 摘要
+     （100字以內）
+
+     ---
+
+     ### 🔑 重點整理
+     - 要點一
+     - 要點二
+     - 要點三
 """
     await _run_agent(prompt)
 
@@ -117,8 +134,24 @@ async def run_url_mode(url: str):
 請處理並發布這篇文章：
 1. 使用 read_url 讀取：{url}
 2. 若為英文，用 translate 翻譯成繁體中文
-3. 判斷分類（international 或 technology）
-4. 使用 publish 發布（含中文標題、完整翻譯、100字摘要）
+3. 判斷分類（international、technology 或 local）
+4. 使用 publish 發布每篇文章，注意需要完整翻譯：
+   - title 填入中文標題
+   - content 只包含來源、摘要與重點，不要再重複標題（Hugo 會自動顯示）
+   - content 格式如下：
+     **來源：** xxx｜**發布日期：** yyyy-mm-dd
+
+     ---
+
+     ### 📋 摘要
+     （100字以內）
+
+     ---
+
+     ### 🔑 重點整理
+     - 要點一
+     - 要點二
+     - 要點三
 """
     await _run_agent(prompt)
 
