@@ -9,8 +9,9 @@
 ## ✨ 功能特色
 
 - 🤖 **AI 驅動** — 使用 Claude Agent SDK 自動完成整個新聞處理流程
-- 🌍 **每日自動抓取** — 每天早上 8:00（台灣時間）自動執行
+- 🌍 **多來源抓取** — NewsAPI + 三個電子報（TLDR Newsletter、1440 Daily Digest、The Rundown AI）
 - 🈯 **英翻中** — 自動將英文新聞翻譯為繁體中文
+- ✉️ **每日 Email 摘要** — GitHub Actions 執行後自動寄送當日新聞摘要（可選）
 - 🔗 **手動 URL 模式** — 貼入任意文章網址，Agent 自動讀取、翻譯、發布
 - 📝 **靜態網站** — 文章以 Markdown 格式儲存，Hugo 建置為靜態網頁
 - 🚀 **全自動部署** — GitHub Actions + Netlify，零手動操作
@@ -27,10 +28,11 @@ GitHub Actions 觸發
         │
         ▼
 Claude Agent SDK
-  ├── fetch_news   → 呼叫 NewsAPI 抓取新聞
-  ├── read_url     → 讀取指定 URL 文章內容
-  ├── translate    → 英文翻譯繁體中文
-  └── publish      → 輸出 Markdown 文章
+  ├── fetch_news       → 呼叫 NewsAPI 抓取新聞
+  ├── fetch_newsletter → 抓取電子報（TLDR、1440、The Rundown AI）
+  ├── read_url         → 讀取指定 URL 文章內容
+  ├── translate        → 英文翻譯繁體中文
+  └── publish          → 輸出 Markdown 文章
         │
         ▼
 output/posts/*.md
@@ -113,6 +115,12 @@ python-dotenv>=1.0.0     # 載入 .env 環境變數
 |------|------|----------|----------|
 | Anthropic | Claude Agent + 翻譯 | 需儲值，最低 $5 美元 | https://console.anthropic.com/ |
 | NewsAPI | 抓取每日新聞 | 每天 100 次請求 | https://newsapi.org/register |
+| Gmail SMTP | 每日 Email 摘要寄送（選項） | 需要 Gmail 帳號 | https://myaccount.google.com/ |
+
+**電子報來源**（無需 API Key，自動爬取）：
+- TLDR Newsletter (https://tldr.tech) — 科技 + AI 新聞
+- 1440 Daily Digest (https://join1440.com) — 國際綜合
+- The Rundown AI (https://therundown.ai) — AI 專項
 
 ---
 
@@ -185,6 +193,9 @@ hugo server --buildDrafts
 |-------------|-----|
 | `ANTHROPIC_API_KEY` | 你的 Anthropic API Key |
 | `NEWS_API_KEY` | 你的 NewsAPI Key |
+| `GMAIL_USER` | 你的 Gmail 信箱（用於寄送每日摘要） |
+| `GMAIL_APP_PASSWORD` | Gmail 應用程式專用密碼（16 位數字密碼） |
+| `RECIPIENT_EMAIL` | 接收每日摘要的信箱 |
 
 ### 設定 Workflow 權限
 
@@ -195,6 +206,28 @@ hugo server --buildDrafts
 - 自動執行：每天 **UTC 00:00**（台灣時間早上 **08:00**）
 - 手動執行：GitHub → Actions → 每日新聞自動發布 → **Run workflow**
 - 手動 URL 模式：Run workflow 時在 URL 欄位填入文章網址
+
+### ✉️ 配置每日 Email 摘要（選項）
+
+若要啟用每日 Email 寄送功能，需要設定 Gmail：
+
+**步驟 1：啟用 Gmail 應用程式密碼**
+
+1. 前往 [Google 帳戶](https://myaccount.google.com/)
+2. 左側選單 → **安全性**
+3. 啟用「兩步驟驗證」（若尚未啟用）
+4. 回到安全性頁面 → **應用程式密碼**
+5. 選擇「郵件」和「Windows 電腦」(或任意選項)
+6. Google 會產生一個 **16 位數字密碼**，複製此密碼
+
+**步驟 2：設定 GitHub Secrets**
+
+新增以下三個 Secrets：
+- `GMAIL_USER`: 你的 Gmail 信箱 (如 `your-email@gmail.com`)
+- `GMAIL_APP_PASSWORD`: 上面複製的 16 位數字密碼
+- `RECIPIENT_EMAIL`: 接收摘要的信箱（可與 GMAIL_USER 相同或不同）
+
+**完成後**，GitHub Actions 執行完畢後會自動寄送當日新聞摘要至指定信箱。
 
 ---
 
@@ -222,11 +255,16 @@ hugo server --buildDrafts
     ├─ 執行 python agent/main.py
     │     ├─ fetch_news (國際新聞 x3)
     │     ├─ fetch_news (科技新聞 x3)
+    │     ├─ fetch_news (本地新聞 x3)
+    │     ├─ fetch_newsletter (TLDR 新聞 x3)
+    │     ├─ fetch_newsletter (1440 新聞 x3)
+    │     ├─ fetch_newsletter (The Rundown AI x3)
     │     ├─ translate (翻譯每篇文章)
     │     └─ publish (輸出 Markdown)
     ├─ 複製文章到 site/content/posts/
     ├─ git commit & push
-    └─ Netlify 自動重新建置 → 網站更新 ✅
+    ├─ Netlify 自動重新建置 → 網站更新 ✅
+    └─ 寄送每日摘要 Email（若已配置 Gmail）→ Email 發送 ✅
 ```
 
 ---

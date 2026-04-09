@@ -15,6 +15,7 @@ from tools.news_fetcher import fetch_top_news
 from tools.url_reader import read_article_from_url
 from tools.translator import translate_to_chinese
 from tools.publisher import publish_article
+from tools.newsletter_fetcher import fetch_newsletters
 
 
 # ─── Tool definitions ────────────────────────────────────────
@@ -67,13 +68,25 @@ async def tool_publish(args):
     return {"content": [{"type": "text", "text": f"已發布：{filepath}"}]}
 
 
+@tool("fetch_newsletter", "抓取新聞電子報（TLDR Newsletter、1440 Daily Digest、The Rundown AI）", {
+    "source": str,
+    "max_count": int,
+})
+async def tool_fetch_newsletter(args):
+    articles = await fetch_newsletters(
+        source=args.get("source", "all"),
+        max_count=args.get("max_count", 3),
+    )
+    return {"content": [{"type": "text", "text": str(articles)}]}
+
+
 # ─── Agent runner ────────────────────────────────────────────
 
 async def _run_agent(prompt: str):
     server = create_sdk_mcp_server(
         name="news-tools",
         version="1.0.0",
-        tools=[tool_fetch_news, tool_read_url, tool_translate, tool_publish],
+        tools=[tool_fetch_news, tool_read_url, tool_translate, tool_publish, tool_fetch_newsletter],
     )
 
     options = ClaudeAgentOptions(
@@ -83,6 +96,7 @@ async def _run_agent(prompt: str):
             "mcp__news-tools__read_url",
             "mcp__news-tools__translate",
             "mcp__news-tools__publish",
+            "mcp__news-tools__fetch_newsletter",
         ],
         permission_mode="bypassPermissions",
     )
@@ -104,27 +118,38 @@ async def run_daily_digest():
     today = datetime.now().strftime("%Y-%m-%d")
     prompt = f"""
 今天是 {today}，請完成每日新聞台的工作流程：
+
+【第一部分：傳統新聞來源（NewsAPI）】
 1. 使用 fetch_news 抓取 international 類別前 3 篇新聞
 2. 使用 fetch_news 抓取 technology 類別前 3 篇新聞
 3. 使用 fetch_news 抓取 local 類別前 3 篇新聞（Los Altos、Mountain View、Palo Alto 本地新聞）
-4. 對每篇使用 read_url 讀取完整內容，再用 translate 翻譯成繁體中文
-5. 使用 publish 發布每篇文章，注意：
-   - title 填入中文標題
-   - content 只包含來源、摘要與重點，不要再重複標題（Hugo 會自動顯示）
-   - content 格式如下：
-     **來源：** xxx｜**發布日期：** yyyy-mm-dd
 
-     ---
+【第二部分：新聞電子報（Newsletter）】
+4. 使用 fetch_newsletter 抓取 tldr 電子報前 3 篇科技新聞（category: technology）
+5. 使用 fetch_newsletter 抓取 1440 電子報前 3 篇國際新聞（category: international）
+6. 使用 fetch_newsletter 抓取 rundown 電子報前 3 篇 AI 新聞（category: ai）
 
-     ### 📋 摘要
-     （100字以內）
+【第三部分：文章處理】
+7. 對上述所有文章（共 9-18 篇），逐篇執行：
+   a. 若有 URL，使用 read_url 讀取完整內容
+   b. 若為英文，用 translate 翻譯成繁體中文
+   c. 使用 publish 發布每篇文章，注意：
+      - title 填入中文標題（避免重複）
+      - content 只包含來源、摘要與重點，不要再重複標題（Hugo 會自動顯示）
+      - content 格式如下：
+        **來源：** xxx｜**發布日期：** yyyy-mm-dd
 
-     ---
+        ---
 
-     ### 🔑 重點整理
-     - 要點一
-     - 要點二
-     - 要點三
+        ### 📋 摘要
+        （100字以內）
+
+        ---
+
+        ### 🔑 重點整理
+        - 要點一
+        - 要點二
+        - 要點三
 """
     await _run_agent(prompt)
 

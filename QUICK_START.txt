@@ -1,0 +1,82 @@
+╔═══════════════════════════════════════════════════════════════╗
+║          📰 Bit Daily 升級快速開始指南（5分鐘）                ║
+╚═══════════════════════════════════════════════════════════════╝
+
+✨ 新增功能
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣ 多來源電子報抓取
+   • TLDR Newsletter → 科技 + AI 新聞
+   • 1440 Daily Digest → 國際綜合新聞  
+   • The Rundown AI → AI 專項新聞
+
+2️⃣ 每日 Email 摘要寄送
+   • 自動產生 HTML 格式
+   • 每日摘要 + 原文連結
+   • 使用 Gmail SMTP
+
+
+🔧 配置（只需5步）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+第1步：啟用 Gmail 應用程式密碼
+  1. 前往 https://myaccount.google.com
+  2. 安全性 → 應用程式密碼
+  3. 複製 16 位密碼
+
+第2步：設定 GitHub Secrets
+  在 GitHub Repo Settings → Secrets → 新增：
+  
+  Secret 名稱                  值
+  ─────────────────────────────────────────
+  GMAIL_USER                  你的Gmail信箱
+  GMAIL_APP_PASSWORD          16位密碼
+  RECIPIENT_EMAIL             接收信箱
+
+第3步：本地測試（可選）
+  source venv/bin/activate
+  python agent/main.py         # 測試抓取
+  python agent/send_email.py   # 測試Email
+
+第4步：GitHub 手動執行
+  Actions → Run workflow → 觀看日誌
+
+第5步：檢查收件箱
+  找到 Email → 成功！
+
+
+❓ 常見問題
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Q1: The Rundown AI 為什麼沒有文章？
+    → JS 渲染，無法爬取（預期行為）
+    → 可用 read_url 補充（Agent 會自動處理）
+
+Q2: Email 沒收到？
+    → 檢查垃圾信件夾
+    → 驗證三個 Secrets 都填正確
+    → GitHub Actions 日誌有無錯誤
+
+Q3: 用不了 Gmail 怎麼辦？
+    → 不設定 Email Secrets
+    → GitHub Actions 會自動跳過
+    → 網站和抓取照常工作
+
+
+📂 重要文件
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+UPGRADE_GUIDE.md       完整升級指南
+QUICK_START.txt       本文件（快速開始）
+tools/newsletter_fetcher.py    電子報爬蟲代碼
+agent/send_email.py           Email 腳本
+
+
+🚀 就這樣！
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 代碼已就緒
+✅ 測試已通過
+✅ 文檔已完成
+
+只需配置 3 個 GitHub Secrets，一切就會自動運作！
