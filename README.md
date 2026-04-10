@@ -30,8 +30,8 @@ GitHub Actions 觸發
 Claude Agent SDK
   ├── fetch_news       → 呼叫 NewsAPI 抓取新聞
   ├── fetch_newsletter → 抓取電子報（TLDR、1440、The Rundown AI）
-  ├── read_url         → 讀取指定 URL 文章內容
-  ├── translate        → 英文翻譯繁體中文
+  ├── web_fetch        → 使用原生工具讀取 URL 內容（享受免費 code execution）
+  ├── [Agent 內部翻譯] → 分析文章，若為英文自動翻譯成繁體中文
   └── publish          → 輸出 Markdown 文章
         │
         ▼
@@ -60,8 +60,7 @@ claude-news-agent/
 ├── tools/
 │   ├── __init__.py
 │   ├── news_fetcher.py          # 呼叫 NewsAPI 取得新聞列表
-│   ├── url_reader.py            # 抓取並解析任意網頁內容
-│   ├── translator.py            # 英翻中（呼叫 Claude Messages API）
+│   ├── newsletter_fetcher.py    # 爬取電子報（TLDR、1440、The Rundown AI）
 │   └── publisher.py             # 輸出 Hugo 相容的 Markdown 檔案
 ├── site/                        # Hugo 靜態網站
 │   ├── content/posts/           # 發布的新聞文章
@@ -104,8 +103,6 @@ hugo version
 ```
 anthropic>=0.40.0        # Anthropic Python SDK
 claude-agent-sdk>=0.1.0  # Claude Agent SDK
-aiohttp>=3.9.0           # 非同步 HTTP 請求
-beautifulsoup4>=4.12.0   # HTML 解析（URL 讀取工具）
 python-dotenv>=1.0.0     # 載入 .env 環境變數
 ```
 
@@ -252,14 +249,15 @@ hugo server --buildDrafts
     │
     ├─ GitHub Actions 啟動
     ├─ 安裝 Python 套件 + Claude CLI
-    ├─ 執行 python agent/main.py
+    ├─ 執行 python agent/main.py（單一 Agent API 呼叫）
     │     ├─ fetch_news (國際新聞 x3)
     │     ├─ fetch_news (科技新聞 x3)
     │     ├─ fetch_news (本地新聞 x3)
     │     ├─ fetch_newsletter (TLDR 新聞 x3)
     │     ├─ fetch_newsletter (1440 新聞 x3)
     │     ├─ fetch_newsletter (The Rundown AI x3)
-    │     ├─ translate (翻譯每篇文章)
+    │     ├─ web_fetch (讀取每篇文章 URL)
+    │     ├─ [Agent 內部翻譯] (分析內容 + 自動翻譯)
     │     └─ publish (輸出 Markdown)
     ├─ 複製文章到 site/content/posts/
     ├─ git commit & push
@@ -269,14 +267,17 @@ hugo server --buildDrafts
 
 ---
 
-## 🛠️ Agent SDK vs Messages API
+## 🚀 架構優化（v2.0+）
 
-本專案混合使用兩種 Anthropic API：
+本專案經過優化，採用最高效的 Claude Agent SDK 使用模式：
 
-| | 使用場景 | 原因 |
-|--|----------|------|
-| **Claude Agent SDK** | 主要工作流程 | 需要工具迴圈（抓取→翻譯→發布） |
-| **Messages API** | 翻譯工具內部 | 翻譯是單一明確任務，不需要 Agent 迴圈，更省 token |
+| 優化項目 | 改動 | 收益 |
+|---------|------|------|
+| **Web 內容讀取** | 改用 Claude 原生 `web_fetch` 工具 | ✓ 享受免費 code execution<br>✓ 移除 BeautifulSoup 依賴 |
+| **翻譯整合** | 改由 Agent 內部進行文章翻譯 | ✓ 單一 API 呼叫<br>✓ Context 完全共享<br>✓ 減少 token 消耗 |
+| **Prompt Caching** | 待 Agent SDK v0.2.0+ 支持 | ✓ 每日重複 prompt 費用降 90% |
+
+**結果**：整個新聞抓取→翻譯→發布流程在一次 Agent API 呼叫中完成，最大化效率與成本控制。
 
 ---
 
