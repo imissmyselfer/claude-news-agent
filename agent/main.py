@@ -12,7 +12,6 @@ from claude_agent_sdk import (
 )
 
 from tools.news_fetcher import fetch_top_news
-from tools.url_reader import read_article_from_url
 from tools.translator import translate_to_chinese
 from tools.publisher import publish_article
 from tools.newsletter_fetcher import fetch_newsletters
@@ -30,14 +29,6 @@ async def tool_fetch_news(args):
         max_count=args.get("max_count", 5),
     )
     return {"content": [{"type": "text", "text": str(articles)}]}
-
-
-@tool("read_url", "從指定 URL 讀取文章完整內容", {
-    "url": str,
-})
-async def tool_read_url(args):
-    content = await read_article_from_url(args["url"])
-    return {"content": [{"type": "text", "text": content}]}
 
 
 @tool("translate", "將英文文章翻譯成繁體中文", {
@@ -86,17 +77,17 @@ async def _run_agent(prompt: str):
     server = create_sdk_mcp_server(
         name="news-tools",
         version="1.0.0",
-        tools=[tool_fetch_news, tool_read_url, tool_translate, tool_publish, tool_fetch_newsletter],
+        tools=[tool_fetch_news, tool_translate, tool_publish, tool_fetch_newsletter],
     )
 
     options = ClaudeAgentOptions(
         mcp_servers={"news-tools": server},   # ← dict, not list
         allowed_tools=[
             "mcp__news-tools__fetch_news",
-            "mcp__news-tools__read_url",
             "mcp__news-tools__translate",
             "mcp__news-tools__publish",
             "mcp__news-tools__fetch_newsletter",
+            "web_fetch",  # ← 原生工具，自動可用
         ],
         permission_mode="bypassPermissions",
     )
@@ -131,7 +122,7 @@ async def run_daily_digest():
 
 【第三部分：文章處理】
 7. 對上述所有文章（共 9-18 篇），逐篇執行：
-   a. 若有 URL，使用 read_url 讀取完整內容
+   a. 若有 URL，使用 web_fetch 讀取完整內容
    b. 若為英文，用 translate 翻譯成繁體中文
    c. 使用 publish 發布每篇文章，注意：
       - title 填入中文標題（避免重複）
@@ -157,7 +148,7 @@ async def run_daily_digest():
 async def run_url_mode(url: str):
     prompt = f"""
 請處理並發布這篇文章：
-1. 使用 read_url 讀取：{url}
+1. 使用 web_fetch 讀取：{url}
 2. 若為英文，用 translate 翻譯成繁體中文
 3. 判斷分類（international、technology 或 local）
 4. 使用 publish 發布每篇文章，注意需要完整翻譯：
