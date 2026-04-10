@@ -12,7 +12,6 @@ from claude_agent_sdk import (
 )
 
 from tools.news_fetcher import fetch_top_news
-from tools.translator import translate_to_chinese
 from tools.publisher import publish_article
 from tools.newsletter_fetcher import fetch_newsletters
 
@@ -29,18 +28,6 @@ async def tool_fetch_news(args):
         max_count=args.get("max_count", 5),
     )
     return {"content": [{"type": "text", "text": str(articles)}]}
-
-
-@tool("translate", "將英文文章翻譯成繁體中文", {
-    "text": str,
-    "title": str,
-})
-async def tool_translate(args):
-    result = await translate_to_chinese(
-        text=args["text"],
-        title=args.get("title", ""),
-    )
-    return {"content": [{"type": "text", "text": str(result)}]}
 
 
 @tool("publish", "將整理好的文章發布成 Markdown 檔案", {
@@ -77,14 +64,13 @@ async def _run_agent(prompt: str):
     server = create_sdk_mcp_server(
         name="news-tools",
         version="1.0.0",
-        tools=[tool_fetch_news, tool_translate, tool_publish, tool_fetch_newsletter],
+        tools=[tool_fetch_news, tool_publish, tool_fetch_newsletter],
     )
 
     options = ClaudeAgentOptions(
         mcp_servers={"news-tools": server},   # ← dict, not list
         allowed_tools=[
             "mcp__news-tools__fetch_news",
-            "mcp__news-tools__translate",
             "mcp__news-tools__publish",
             "mcp__news-tools__fetch_newsletter",
             "web_fetch",  # ← 原生工具，自動可用
@@ -123,7 +109,7 @@ async def run_daily_digest():
 【第三部分：文章處理】
 7. 對上述所有文章（共 9-18 篇），逐篇執行：
    a. 若有 URL，使用 web_fetch 讀取完整內容
-   b. 若為英文，用 translate 翻譯成繁體中文
+   b. 分析文章內容，若為英文請翻譯成繁體中文（包含標題、摘要、重點整理都要翻譯）
    c. 使用 publish 發布每篇文章，注意：
       - title 填入中文標題（避免重複）
       - content 只包含來源、摘要與重點，不要再重複標題（Hugo 會自動顯示）
@@ -133,7 +119,7 @@ async def run_daily_digest():
         ---
 
         ### 📋 摘要
-        （100字以內）
+        （100字以內的中文摘要）
 
         ---
 
@@ -149,9 +135,9 @@ async def run_url_mode(url: str):
     prompt = f"""
 請處理並發布這篇文章：
 1. 使用 web_fetch 讀取：{url}
-2. 若為英文，用 translate 翻譯成繁體中文
+2. 分析文章內容，若為英文請翻譯成繁體中文（包含標題、摘要、重點整理都要翻譯）
 3. 判斷分類（international、technology 或 local）
-4. 使用 publish 發布每篇文章，注意需要完整翻譯：
+4. 使用 publish 發布文章，注意：
    - title 填入中文標題
    - content 只包含來源、摘要與重點，不要再重複標題（Hugo 會自動顯示）
    - content 格式如下：
@@ -160,7 +146,7 @@ async def run_url_mode(url: str):
      ---
 
      ### 📋 摘要
-     （100字以內）
+     （100字以內的中文摘要）
 
      ---
 
