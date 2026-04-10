@@ -67,6 +67,11 @@ async def _run_agent(prompt: str):
         tools=[tool_fetch_news, tool_publish, tool_fetch_newsletter],
     )
 
+    # TODO: 待 Claude Agent SDK 支持 cache_control 參數後，
+    # 在 ClaudeAgentOptions 中加入：
+    #   cache_control={"type": "ephemeral"}
+    # 這樣可以將系統 prompt（每日相同）的費用從 100% 降至 10%
+    # 預期 Agent SDK v0.2.0+ 會支持此功能
     options = ClaudeAgentOptions(
         mcp_servers={"news-tools": server},   # ← dict, not list
         allowed_tools=[
