@@ -5,6 +5,7 @@
 """
 
 import os
+import re
 import sys
 import re
 import smtplib
@@ -182,7 +183,6 @@ def send_email(subject: str, html_body: str) -> bool:
 
 
 def main():
-    """主程式"""
     # 檢查環境變數
     if not GMAIL_USER or not GMAIL_APP_PASSWORD or not RECIPIENT_EMAIL:
         print("⚠️  未設定完整的 Email 環境變數")
@@ -194,19 +194,38 @@ def main():
 
     today = date.today().strftime("%Y-%m-%d")
 
-    # 讀取今天的文章
-    articles = read_today_articles()
-    print(f"📄 找到 {len(articles)} 篇今日文章")
+    # 判斷是 pipe 輸入還是讀檔案
+    if not sys.stdin.isatty():
+        # 從 pipe 接收 claude 輸出
+        print("📥 從 pipe 接收內容...")
+        content = sys.stdin.read().strip()
+        # 清掉 markdown code block
+        content = re.sub(r'^```html\s*', '', content, flags=re.MULTILINE)
+        content = re.sub(r'^```\s*$', '', content, flags=re.MULTILINE)
+        html_body = f"""
+        <html>
+        <head><meta charset="UTF-8"></head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; background-color: #f5f5f5;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px;">
+                <h1 style="color: #2c3e50;">📰 Bit Daily - 每日新聞摘要</h1>
+                <p style="color: #7f8c8d; font-size: 14px;">發布日期：{today}</p>
+                <hr style="border: none; border-top: 1px solid #ecf0f1; margin: 20px 0;">
+                <div style="line-height: 1.8;">{content}</div>
+                <hr style="border: none; border-top: 1px solid #ecf0f1; margin: 20px 0;">
+                <p style="color: #95a5a6; font-size: 12px; text-align: center;">由 Bit Daily 自動生成</p>
+            </div>
+        </body>
+        </html>
+        """
+    else:
+        # 原本的邏輯：讀取 output/posts/ 裡的檔案
+        articles = read_today_articles()
+        print(f"📄 找到 {len(articles)} 篇今日文章")
+        html_body = build_email_html(articles, today)
 
-    # 構建 Email HTML
-    html_body = build_email_html(articles, today)
-
-    # 寄送 Email
     subject = f"📰 Bit Daily - {today} 每日新聞摘要"
     success = send_email(subject, html_body)
-
     return 0 if success else 1
-
-
+    
 if __name__ == "__main__":
     sys.exit(main())
