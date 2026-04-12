@@ -102,8 +102,8 @@ async def run_daily_digest():
 今天是 {today}，請完成每日新聞台的工作流程：
 
 【第一部分：傳統新聞來源（NewsAPI）】
-1. 使用 fetch_news 抓取 international 類別前 3 篇新聞
-2. 使用 fetch_news 抓取 technology 類別前 3 篇新聞
+1. 使用 fetch_news 抓取 international 類別前 5 篇新聞
+2. 使用 fetch_news 抓取 technology 類別前 5 篇新聞
 3. 使用 fetch_news 抓取 local 類別前 3 篇新聞（Los Altos、Mountain View、Palo Alto 本地新聞）
 
 【第二部分：新聞電子報（Newsletter）】
