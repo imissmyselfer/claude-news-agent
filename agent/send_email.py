@@ -10,6 +10,7 @@ import sys
 import re
 import smtplib
 import ssl
+import argparse
 from datetime import date
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -82,7 +83,7 @@ def read_today_articles() -> list[dict]:
     return articles
 
 
-def build_email_html(articles: list[dict], today: str) -> str:
+def build_email_html(articles: list[dict], today: str, label: str = "每日新聞摘要") -> str:
     """
     構建 HTML 格式的每日摘要 Email
 
@@ -96,7 +97,7 @@ def build_email_html(articles: list[dict], today: str) -> str:
         <head><meta charset="UTF-8"></head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #2c3e50;">📰 Bit Daily - 每日新聞摘要</h1>
+                <h1 style="color: #2c3e50;">📰 Bit Daily - """ + label + """</h1>
                 <p style="color: #7f8c8d; margin-bottom: 20px;">發布日期：""" + today + """</p>
                 <p style="color: #e74c3c; font-size: 16px;">今日無新文章發布。</p>
             </div>
@@ -124,7 +125,7 @@ def build_email_html(articles: list[dict], today: str) -> str:
     <head><meta charset="UTF-8"></head>
     <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #333; background-color: #f5f5f5;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <h1 style="color: #2c3e50; margin-bottom: 5px;">📰 Bit Daily - 每日新聞摘要</h1>
+            <h1 style="color: #2c3e50; margin-bottom: 5px;">📰 Bit Daily - {label}</h1>
             <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">發布日期：{today}</p>
             <hr style="border: none; border-top: 1px solid #ecf0f1; margin: 20px 0;">
             {articles_html}
@@ -183,6 +184,11 @@ def send_email(subject: str, html_body: str) -> bool:
 
 
 def main():
+    # 解析命令列參數
+    parser = argparse.ArgumentParser(description="寄送每日新聞摘要 Email")
+    parser.add_argument("--label", default="每日新聞摘要", help="Email 主旨標籤（預設：每日新聞摘要）")
+    args = parser.parse_args()
+
     # 檢查環境變數
     if not GMAIL_USER or not GMAIL_APP_PASSWORD or not RECIPIENT_EMAIL:
         print("⚠️  未設定完整的 Email 環境變數")
@@ -207,7 +213,7 @@ def main():
         <head><meta charset="UTF-8"></head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; background-color: #f5f5f5;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px;">
-                <h1 style="color: #2c3e50;">📰 Bit Daily - 每日新聞摘要</h1>
+                <h1 style="color: #2c3e50;">📰 Bit Daily - {args.label}</h1>
                 <p style="color: #7f8c8d; font-size: 14px;">發布日期：{today}</p>
                 <hr style="border: none; border-top: 1px solid #ecf0f1; margin: 20px 0;">
                 <div style="line-height: 1.8;">{content}</div>
@@ -221,9 +227,9 @@ def main():
         # 原本的邏輯：讀取 output/posts/ 裡的檔案
         articles = read_today_articles()
         print(f"📄 找到 {len(articles)} 篇今日文章")
-        html_body = build_email_html(articles, today)
+        html_body = build_email_html(articles, today, args.label)
 
-    subject = f"📰 Bit Daily - {today} 每日新聞摘要"
+    subject = f"📰 Bit Daily - {today} {args.label}"
     success = send_email(subject, html_body)
     return 0 if success else 1
     

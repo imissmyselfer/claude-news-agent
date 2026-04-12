@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 .DS_Store
 venv/
+.claude/
+logs/
+output/
+VOCAB_HISTORY.md
