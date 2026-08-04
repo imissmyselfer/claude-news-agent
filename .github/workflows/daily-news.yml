@@ -57,7 +57,7 @@ jobs:
         run: |
           git config user.name "News Bot"
           git config user.email "bot@newsbot.local"
-          git add output/posts/ site/content/posts/
+          git add site/content/posts/
           git diff --staged --quiet || git commit -m "📰 自動發布新聞 $(date +'%Y-%m-%d')"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
